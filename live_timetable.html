@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WMCCTC – Live Timetable – 12 June 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;800&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Barlow', Arial, sans-serif;
+    background: #f0f4f8;
+    color: #1a1a2e;
+    min-height: 100vh;
+  }
+
+  /* ── Header ─────────────────────────────────── */
+  .header {
+    background: linear-gradient(135deg, #1F3864 0%, #2E75B6 100%);
+    padding: 16px 20px 12px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .header-text { flex: 1; }
+  .header-text h1 {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+  .header-text .subtitle {
+    color: #F4B942;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-top: 3px;
+    text-transform: uppercase;
+  }
+
+  /* ── Live clock bar ──────────────────────────── */
+  .clock-bar {
+    background: #F4B942;
+    padding: 7px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .clock-bar .date-venue {
+    font-size: 11px;
+    font-weight: 700;
+    color: #1F3864;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .clock-bar .live-clock {
+    font-size: 15px;
+    font-weight: 800;
+    color: #1F3864;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 1px;
+  }
+
+  /* ── Status banner ───────────────────────────── */
+  #status-banner {
+    margin: 12px 16px 0;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    display: none;
+  }
+  #status-banner.live {
+    background: #e6f9ee;
+    border-left: 4px solid #28a745;
+    color: #155724;
+    display: block;
+  }
+  #status-banner.waiting {
+    background: #fff8e6;
+    border-left: 4px solid #F4B942;
+    color: #7B5C00;
+    display: block;
+  }
+  #status-banner.ended {
+    background: #f0f4f8;
+    border-left: 4px solid #6c757d;
+    color: #495057;
+    display: block;
+  }
+  #status-banner.wrong-day {
+    background: #EBF3FB;
+    border-left: 4px solid #2E75B6;
+    color: #1F3864;
+    display: block;
+  }
+  .pulse-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: #28a745;
+    border-radius: 50%;
+    margin-right: 7px;
+    animation: pulse 1.4s ease-in-out infinite;
+    vertical-align: middle;
+  }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(40,167,69,0.6); }
+    70%  { box-shadow: 0 0 0 8px rgba(40,167,69,0); }
+    100% { box-shadow: 0 0 0 0 rgba(40,167,69,0); }
+  }
+
+  /* ── Section label ───────────────────────────── */
+  .section-label {
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #2E75B6;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 14px 16px 6px;
+    padding-left: 8px;
+    border-left: 3px solid #F4B942;
+  }
+
+  /* ── Session rows ────────────────────────────── */
+  .session-list {
+    margin: 0 16px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #dce4ed;
+    background: #fff;
+    margin-bottom: 6px;
+  }
+  .session-row {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid #e8ecf0;
+    transition: background 0.3s;
+    position: relative;
+  }
+  .session-row:last-child { border-bottom: none; }
+
+  /* Time column */
+  .time-col {
+    min-width: 88px;
+    padding: 9px 10px;
+    background: #EBF3FB;
+    font-size: 11px;
+    font-weight: 700;
+    color: #1F3864;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    border-right: 1px solid #dce4ed;
+    flex-shrink: 0;
+  }
+
+  /* Content column */
+  .content-col {
+    flex: 1;
+    padding: 9px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .session-title {
+    font-weight: 700;
+    font-size: 12.5px;
+    color: #1F3864;
+    line-height: 1.3;
+  }
+  .session-detail {
+    font-size: 10.5px;
+    color: #5a6a7e;
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+
+  /* Break rows */
+  .session-row.break .time-col {
+    background: #f5f5f5;
+    color: #888;
+  }
+  .session-row.break .content-col {
+    background: #f9f9f9;
+    font-style: italic;
+    color: #888;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* PAST rows */
+  .session-row.past .time-col {
+    opacity: 0.45;
+  }
+  .session-row.past .content-col {
+    opacity: 0.4;
+  }
+  .session-row.past .session-title {
+    text-decoration: line-through;
+    text-decoration-color: #aaa;
+  }
+
+  /* CURRENT (live) row */
+  .session-row.current {
+    background: #e6f9ee;
+    border-left: 4px solid #28a745;
+  }
+  .session-row.current .time-col {
+    background: #d0f0dc;
+    color: #155724;
+    border-right-color: #9dddb6;
+  }
+  .session-row.current .session-title {
+    color: #155724;
+  }
+  .session-row.current .session-detail {
+    color: #2d7a4e;
+  }
+
+  /* NOW badge */
+  .now-badge {
+    display: none;
+    align-items: center;
+    gap: 5px;
+    background: #28a745;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 20px;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .now-badge .dot {
+    width: 7px;
+    height: 7px;
+    background: #fff;
+    border-radius: 50%;
+    animation: pulse-white 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse-white {
+    0%   { box-shadow: 0 0 0 0 rgba(255,255,255,0.7); }
+    70%  { box-shadow: 0 0 0 6px rgba(255,255,255,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+  }
+  .session-row.current .now-badge { display: flex; }
+
+  /* Badges */
+  .badge-new {
+    display: inline-block;
+    background: #C55A11;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: 5px;
+    text-transform: uppercase;
+    vertical-align: middle;
+    letter-spacing: 0.5px;
+  }
+  .badge-upd {
+    display: inline-block;
+    background: #2E75B6;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: 5px;
+    text-transform: uppercase;
+    vertical-align: middle;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Rotation / Sim sub-table ─────────────────── */
+  .group-grid {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .group-chip {
+    font-size: 9.5px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+  .g1 { background: #BDD7EE; color: #1F3864; }
+  .g2 { background: #FCE4D6; color: #7B3200; }
+  .g3 { background: #E2EFDA; color: #1D5C1D; }
+  .g4 { background: #EAD1DC; color: #6B1F3F; }
+  .ga { background: #BDD7EE; color: #1F3864; }
+  .gb { background: #FCE4D6; color: #7B3200; }
+  .gc { background: #E2EFDA; color: #1D5C1D; }
+  .gd { background: #EAD1DC; color: #6B1F3F; }
+
+  /* ── ICS bar ─────────────────────────────────── */
+  .ics-bar {
+    margin: 10px 16px;
+    background: #EBF3FB;
+    border-left: 4px solid #2E75B6;
+    padding: 8px 12px;
+    border-radius: 0 4px 4px 0;
+    font-size: 10px;
+    color: #1F3864;
+    line-height: 1.5;
+  }
+
+  /* ── Footer ──────────────────────────────────── */
+  .footer {
+    background: #1F3864;
+    padding: 8px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .footer span { color: rgba(255,255,255,0.65); font-size: 9.5px; }
+  .footer .r-badge {
+    background: #F4B942;
+    color: #1F3864;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 3px;
+  }
+
+  /* ── Responsive ──────────────────────────────── */
+  @media (max-width: 480px) {
+    .time-col { min-width: 72px; font-size: 10px; }
+    .session-title { font-size: 11.5px; }
+    .header-text h1 { font-size: 14px; }
+    .group-chip { font-size: 8.5px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ──────────────────────────────────────────── -->
+<div class="header">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="54" height="54" style="flex-shrink:0;border-radius:50%;">
+    <defs>
+      <path id="topArc" d="M 24,100 a 76,76 0 1,1 152,0" />
+      <path id="botArc" d="M 26,108 a 74,74 0 0,0 148,0" />
+    </defs>
+    <circle cx="100" cy="100" r="98" fill="#1F3864"/>
+    <circle cx="100" cy="100" r="84" fill="none" stroke="#C8922A" stroke-width="3.5"/>
+    <circle cx="100" cy="100" r="68" fill="#2D5FA6"/>
+    <circle cx="100" cy="100" r="68" fill="none" stroke="white" stroke-width="3"/>
+    <rect x="38" y="90" width="78" height="38" rx="3" fill="white"/>
+    <rect x="112" y="97" width="28" height="31" rx="3" fill="white"/>
+    <rect x="115" y="100" width="20" height="16" rx="2" fill="#2D5FA6"/>
+    <rect x="55" y="97" width="8" height="24" rx="1" fill="#2D5FA6"/>
+    <rect x="49" y="103" width="20" height="8" rx="1" fill="#2D5FA6"/>
+    <circle cx="60" cy="130" r="9" fill="#1F3864" stroke="white" stroke-width="2"/>
+    <circle cx="60" cy="130" r="4" fill="#2D5FA6"/>
+    <circle cx="118" cy="130" r="9" fill="#1F3864" stroke="white" stroke-width="2"/>
+    <circle cx="118" cy="130" r="4" fill="#2D5FA6"/>
+    <rect x="108" y="84" width="16" height="8" rx="2" fill="#2D5FA6" stroke="white" stroke-width="1.5"/>
+    <text font-family="Arial, sans-serif" font-size="13.5" font-weight="800" fill="white" letter-spacing="1.5">
+      <textPath href="#topArc" startOffset="10%">WEST MIDLANDS CRITICAL CARE</textPath>
+    </text>
+    <text font-family="Arial, sans-serif" font-size="13.5" font-weight="800" fill="white" letter-spacing="2">
+      <textPath href="#botArc" startOffset="18%">TRANSFER COURSE</textPath>
+    </text>
+  </svg>
+  <div class="header-text">
+    <h1>West Midlands Critical Care<br>Transfer Course</h1>
+    <div class="subtitle">ICS 5th Edition 2026 &nbsp;|&nbsp; Live Programme</div>
+  </div>
+</div>
+
+<!-- ── CLOCK BAR ────────────────────────────────────────── -->
+<div class="clock-bar">
+  <span class="date-venue">&#128197; 12 June 2026 &nbsp;|&nbsp; &#128205; Education Centre, Level 5 – MMUH</span>
+  <span class="live-clock" id="clock">--:--</span>
+</div>
+
+<!-- ── STATUS BANNER ────────────────────────────────────── -->
+<div id="status-banner"></div>
+
+<!-- ── MORNING PLENARIES ─────────────────────────────────── -->
+<div class="section-label">Morning Plenaries</div>
+<div class="session-list">
+
+  <div class="session-row" data-start="08:00" data-end="08:15">
+    <div class="time-col">08:00&ndash;08:15</div>
+    <div class="content-col">
+      <div>
+        <div class="session-title">Registration</div>
+      </div>
+      <div class="now-badge"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+
+  <div class="session-row" data-start="08:15" data-end="08:20">
+    <div class="time-col">08:15&ndash;08:20</div>
+    <div class="content-col">
+      <div>
+        <div class="session-title">Welcome &amp; Housekeeping</div>
+        <div class="session-detail">ACCP Sonia Cole</div>
+      </div>
+      <div class="now-badge"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+
+  <div class="session-row" data-start="08:20" data-end="08:45">
+    <div class="time-col">08:20&ndash;08:45</div>
+    <div class="content-col">
+      <div>
+        <div class="session-title">Introduction to Transfer</div>
+        <div class="session-detail">ICS 5th Edition 2026 – overview and what has changed &nbsp;|&nbsp; ACCP Emma Whyman</div>
+      </div>
+      <div class="now-badge"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+
+  <div class="session-row" data-start="08:45" data-end="09:15">
+    <div class="time-col">08:45&ndash;09:15</div>
+    <div class="content-col">
+      <div>
+        <div class="session-title">Initial Considerations for Transfer</div>
+        <div class="session-detail">Prof Jon Hulme</div>
+      </div>
+      <div class="now-badge"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+
+  <div class="session-row" data-start="09:15" data-end="09:55">
+    <div class="time-col">09:15&ndash;09:55</div>
+    <div class="content-col">
+      <div>
+        <div class="session-title">Ventilation for Transfer</div>
+        <div class="session-detail">Transport ventilator settings &nbsp;|&nbsp; Monitoring targets &nbsp;|&nbsp; Waveform interpretation in transit &nbsp;|&nbsp; Dr Kieran Donnelly</div>
+      </div>
+      <div class="now-badge"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+
+  <div class="session-row" data-start="09:55" data-end="10:25">
+    <div class="time-col">09:55&ndash;10:25</div>
+    <div class="content-col">
+      <div>
+        <div class="session-title">Safe Transfer of the Brain Injured Patient</div>
+        <div class="session-detail">Intubation criteria &nbsp;|&nbsp; ICP management &nbsp;|&nbsp; Neuromonitoring during transfer &nbsp;|&nbsp; Dr Thomas Burton</div>
+      </div>
+      <div class="now-badge"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+
+  <div class="session-row" data-start="10:25" data-end="10:50">
+    <div class="time-col">10:25&ndash;10:50</div>
+    <div class="content-col">
+      <div>
+        <div class="session-title">ACCoTS – Adult Critical Care Transfer Service</div>
+        <div class="session-detail">Role of the West Midlands dedicated transfer service &nbsp;|&nbsp; When and how to call &nbsp;|&nbsp; Andrew Boazman (Deputy Lead Practitioner)</div>
+      </div>
+      <div class="now-badge"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+
+  <div class="session-row break" data-start="10:50" data-end="11:05">
+    <div class="time-col">10:50&ndash;11:05</div>
+    <div class="content-col">
+      &#9749; Coffee Break
+      <div class="now-badge" style="background:#888;"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+
+</div><!-- /morning plenaries -->
+
+<!-- ── SMALL GROUP ROTATIONS ─────────────────────────────── -->
+<div class="section-label">Small Group Rotations &nbsp;&#8212;&nbsp; 35 minutes each</div>
+<div class="session-list">
+
+  <div class="session-row" data-start="11:05" data-end="11:35">
+    <div class="time-col">11:05&ndash;11:35</div>
+    <div class="content-col">
+      <div>
+        <div class="session-title">Rotation Round 1</div>
+        <div class="group-grid">
+          <span class="group-chip g1">Grp 1 – Ventilation Case Review</span>
+          <span class="group-chip g2">Grp 2 – Cardiovascular Case Review</span>
+          <span class="group-chip g3">Grp 3 – Specialist Scenarios</span>
+          <span class="group-chip g4">Grp 4 – Sedation Review</span>
+        </div>
+      </div>
+      <div class="now-badge"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+
+  <div class="session-row" data-start="11:35" data-end="12:10">
+    <div class="time-col">11:35&ndash;12:10</div>
+    <div class="content-col">
+      <div>
+        <div class="session-title">Rotation Round 2</div>
+        <div class="group-grid">
+          <span class="group-chip g2">Grp 2 – Ventilation Case Review</span>
+          <span class="group-chip g1">Grp 1 – Cardiovascular Case Review</span>
+          <span class="group-chip g4">Grp 4 – Specialist Scenarios</span>
+          <span class="group-chip g3">Grp 3 – Sedation Review</span>
+        </div>
+      </div>
+      <div class="now-badge"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+
+  <div class="session-row" data-start="12:10" data-end="12:45">
+    <div class="time-col">12:10&ndash;12:45</div>
+    <div class="content-col">
+      <div>
+        <div class="session-title">Rotation Round 3</div>
+        <div class="group-grid">
+          <span class="group-chip g3">Grp 3 – Ventilation Case Review</span>
+          <span class="group-chip g4">Grp 4 – Cardiovascular Case Review</span>
+          <span class="group-chip g1">Grp 1 – Specialist Scenarios</span>
+          <span class="group-chip g2">Grp 2 – Sedation Review</span>
+        </div>
+      </div>
+      <div class="now-badge"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+
+  <div class="session-row" data-start="12:45" data-end="13:20">
+    <div class="time-col">12:45&ndash;13:20</div>
+    <div class="content-col">
+      <div>
+        <div class="session-title">Rotation Round 4</div>
+        <div class="group-grid">
+          <span class="group-chip g4">Grp 4 – Ventilation Case Review</span>
+          <span class="group-chip g3">Grp 3 – Cardiovascular Case Review</span>
+          <span class="group-chip g2">Grp 2 – Specialist Scenarios</span>
+          <span class="group-chip g1">Grp 1 – Sedation Review</span>
+        </div>
+      </div>
+      <div class="now-badge"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+
+</div><!-- /rotations -->
+
+<!-- ── LUNCH ─────────────────────────────────────────────── -->
+<div class="session-list">
+  <div class="session-row break" data-start="13:30" data-end="14:00">
+    <div class="time-col">13:30&ndash;14:00</div>
+    <div class="content-col">
+      &#127860; Lunch &nbsp;&#8212;&nbsp; FERNO Transfer Trolley &amp; Transport Ventilator Display
+      <div class="now-badge" style="background:#888;"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── AFTERNOON ──────────────────────────────────────────── -->
+<div class="session-list" style="margin-top:0;">
+  <div class="session-row" data-start="14:00" data-end="14:30">
+    <div class="time-col">14:00&ndash;14:30</div>
+    <div class="content-col">
+      <div>
+        <div class="session-title">Equipment for Transfer</div>
+        <div class="session-detail">Transfer trolley &amp; transport ventilator &nbsp;|&nbsp; Lucy Peacock &amp; Janine Lonsdale</div>
+      </div>
+      <div class="now-badge"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SIMULATION ─────────────────────────────────────────── -->
+<div class="section-label">Simulation &amp; Clinical Skills &nbsp;&#8212;&nbsp; 45 minutes each</div>
+<div class="session-list">
+
+  <div class="session-row" data-start="14:30" data-end="15:15">
+    <div class="time-col">14:30&ndash;15:15</div>
+    <div class="content-col">
+      <div>
+        <div class="session-title">Simulation Block 1</div>
+        <div class="group-grid">
+          <span class="group-chip ga">Grp 1 – Transfer Scenario 1 (Sim Suite)</span>
+          <span class="group-chip gb">Grp 2 – Comm / Debrief</span>
+          <span class="group-chip gc">Grp 3 – Transfer Scenario 3 (Skills Room)</span>
+          <span class="group-chip gd">Grp 4 – Comm / Debrief</span>
+        </div>
+      </div>
+      <div class="now-badge"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+
+  <div class="session-row" data-start="15:15" data-end="16:00">
+    <div class="time-col">15:15&ndash;16:00</div>
+    <div class="content-col">
+      <div>
+        <div class="session-title">Simulation Block 2</div>
+        <div class="group-grid">
+          <span class="group-chip gb">Grp 2 – Transfer Scenario 2 (Sim Suite)</span>
+          <span class="group-chip ga">Grp 1 – Comm / Debrief</span>
+          <span class="group-chip gd">Grp 4 – Transfer Scenario 4 (Skills Room)</span>
+          <span class="group-chip gc">Grp 3 – Comm / Debrief</span>
+        </div>
+      </div>
+      <div class="now-badge"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+
+  <div class="session-row break" data-start="16:00" data-end="16:15">
+    <div class="time-col">16:00&ndash;16:15</div>
+    <div class="content-col">
+      &#9749; Coffee Break
+      <div class="now-badge" style="background:#888;"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+
+  <div class="session-row" data-start="16:15" data-end="17:00">
+    <div class="time-col">16:15&ndash;17:00</div>
+    <div class="content-col">
+      <div>
+        <div class="session-title">Simulation Block 3</div>
+        <div class="group-grid">
+          <span class="group-chip gc">Grp 3 – Transfer Scenario 1 (Sim Suite)</span>
+          <span class="group-chip gd">Grp 4 – Comm / Debrief</span>
+          <span class="group-chip ga">Grp 1 – Transfer Scenario 3 (Skills Room)</span>
+          <span class="group-chip gb">Grp 2 – Comm / Debrief</span>
+        </div>
+      </div>
+      <div class="now-badge"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+
+  <div class="session-row" data-start="17:00" data-end="17:45">
+    <div class="time-col">17:00&ndash;17:45</div>
+    <div class="content-col">
+      <div>
+        <div class="session-title">Simulation Block 4</div>
+        <div class="group-grid">
+          <span class="group-chip gd">Grp 4 – Transfer Scenario 2 (Sim Suite)</span>
+          <span class="group-chip gc">Grp 3 – Comm / Debrief</span>
+          <span class="group-chip gb">Grp 2 – Transfer Scenario 4 (Skills Room)</span>
+          <span class="group-chip ga">Grp 1 – Comm / Debrief</span>
+        </div>
+      </div>
+      <div class="now-badge"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+
+  <div class="session-row" data-start="17:45" data-end="18:00">
+    <div class="time-col">17:45&ndash;18:00</div>
+    <div class="content-col">
+      <div>
+        <div class="session-title">Candidate Evaluation &amp; Close</div>
+      </div>
+      <div class="now-badge"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+
+</div><!-- /simulation -->
+
+<!-- ── ICS BAR ──────────────────────────────────────────── -->
+<div class="ics-bar">
+  <strong>Aligned with ICS Transfer of the Critically Ill Adult, 5th Edition (April 2026)</strong>
+  and the ICS Transfer of the Critically Ill Maternity Patient (2026).
+  All documentation references use the 2026 minimum dataset and mandatory checklists.
+</div>
+
+<!-- ── FOOTER ──────────────────────────────────────────── -->
+<div class="footer">
+  <span>West Midlands Critical Care Transfer Course &nbsp;|&nbsp; 12 June 2026</span>
+  <span class="r-badge">R Revalidation for Anaesthetists</span>
+</div>
+
+<!-- ── LIVE SCRIPT ─────────────────────────────────────── -->
+<script>
+  const COURSE_DATE = '2026-06-12'; // yyyy-mm-dd
+
+  function toMinutes(hhmm) {
+    const [h, m] = hhmm.split(':').map(Number);
+    return h * 60 + m;
+  }
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function update() {
+    const now = new Date();
+
+    // Live clock
+    document.getElementById('clock').textContent =
+      pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+
+    const today = now.toISOString().slice(0, 10);
+    const nowMins = now.getHours() * 60 + now.getMinutes();
+
+    const banner = document.getElementById('status-banner');
+    const rows = document.querySelectorAll('.session-row[data-start]');
+
+    // Clear all row states
+    rows.forEach(r => {
+      r.classList.remove('current', 'past');
+    });
+
+    if (today < COURSE_DATE) {
+      // Before course day
+      const daysLeft = Math.ceil((new Date(COURSE_DATE) - new Date(today)) / 86400000);
+      banner.className = 'wrong-day';
+      banner.innerHTML = `&#128197; Course day is <strong>12 June 2026</strong> &mdash; ${daysLeft} day${daysLeft !== 1 ? 's' : ''} to go. Live session tracking activates on the day.`;
+      return;
+    }
+
+    if (today > COURSE_DATE) {
+      // After course day
+      banner.className = 'ended';
+      banner.innerHTML = `&#10003; Course completed &mdash; 12 June 2026. Thank you to all faculty and delegates.`;
+      // Show all as past
+      rows.forEach(r => r.classList.add('past'));
+      return;
+    }
+
+    // IT IS COURSE DAY
+    const courseStart = toMinutes('08:00');
+    const courseEnd   = toMinutes('18:00'); // Evaluation & Close ends 18:00
+
+    if (nowMins < courseStart) {
+      banner.className = 'waiting';
+      const minsLeft = courseStart - nowMins;
+      banner.innerHTML = `&#9203; Course starts at <strong>08:00</strong> &mdash; ${minsLeft} minute${minsLeft !== 1 ? 's' : ''} to go.`;
+      return;
+    }
+
+    if (nowMins >= courseEnd) {
+      banner.className = 'ended';
+      banner.innerHTML = `&#10003; Course day complete. Thank you to all faculty and delegates!`;
+      rows.forEach(r => r.classList.add('past'));
+      return;
+    }
+
+    // Find current session
+    let currentFound = false;
+    rows.forEach(row => {
+      const start = toMinutes(row.dataset.start);
+      const end   = toMinutes(row.dataset.end);
+
+      if (nowMins >= end) {
+        row.classList.add('past');
+      } else if (nowMins >= start && nowMins < end) {
+        row.classList.add('current');
+        currentFound = true;
+      }
+    });
+
+    if (currentFound) {
+      // Find which session is current
+      const currentRow = document.querySelector('.session-row.current');
+      const title = currentRow ? currentRow.querySelector('.session-title') : null;
+      const titleText = title ? title.textContent.replace(/\s*(New|Updated)\s*/gi, '').trim() : 'current session';
+      const endMins = toMinutes(currentRow.dataset.end);
+      const remaining = endMins - nowMins;
+
+      banner.className = 'live';
+      banner.innerHTML = `<span class="pulse-dot"></span><strong>NOW:</strong> ${titleText} &nbsp;&mdash;&nbsp; ${remaining} minute${remaining !== 1 ? 's' : ''} remaining`;
+
+      // Scroll current row into view (gentle, only on course day)
+      if (currentRow) {
+        currentRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  }
+
+  // Run immediately and then every 15 seconds
+  update();
+  setInterval(update, 15000);
+</script>
+
+</body>
+</html>
