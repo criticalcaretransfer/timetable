@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>WMCCTC – Course Director Portal</title>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;800&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Barlow', Arial, sans-serif;
+    background: #f0f4f8;
+    min-height: 100vh;
+  }
+
+  /* ── PIN SCREEN ───────────────────────────── */
+  #pin-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1F3864 0%, #2E75B6 100%);
+    padding: 20px;
+  }
+  .pin-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px 28px;
+    width: 100%;
+    max-width: 320px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .pin-lock {
+    font-size: 36px;
+    margin-bottom: 12px;
+  }
+  .pin-box h2 {
+    font-size: 17px;
+    font-weight: 800;
+    color: #1F3864;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .pin-box p {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 22px;
+  }
+  #pin-dots {
+    font-size: 28px;
+    letter-spacing: 12px;
+    color: #1F3864;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .pin-pad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .pin-btn {
+    background: #EBF3FB;
+    border: none;
+    border-radius: 10px;
+    height: 58px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1F3864;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    font-family: 'Barlow', Arial, sans-serif;
+  }
+  .pin-btn:active { background: #BDD7EE; transform: scale(0.95); }
+  .pin-btn.backspace { font-size: 18px; background: #f5f5f5; color: #888; }
+  .pin-btn.empty { background: transparent; pointer-events: none; }
+  #pin-error {
+    color: #dc3545;
+    font-size: 12px;
+    font-weight: 700;
+    height: 18px;
+    margin-top: 4px;
+  }
+
+  /* ── MANAGEMENT SCREEN ────────────────────── */
+  #mgmt-screen { display: none; }
+
+  .mgmt-header {
+    background: linear-gradient(135deg, #1F3864 0%, #2E75B6 100%);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .mgmt-header .title { flex: 1; }
+  .mgmt-header h1 {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+  }
+  .mgmt-header .subtitle {
+    color: #F4B942;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .lock-badge {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .mgmt-body { padding: 16px; max-width: 480px; margin: 0 auto; }
+
+  /* Live read from Firebase */
+  .current-status-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    border: 1px solid #dce4ed;
+  }
+  .card-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: #2E75B6;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 6px;
+  }
+  #live-status-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+  }
+  #last-updated {
+    font-size: 10px;
+    color: #aaa;
+    margin-top: 4px;
+  }
+
+  /* Offset display */
+  .offset-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px 16px;
+    margin-bottom: 14px;
+    border: 1px solid #dce4ed;
+    text-align: center;
+  }
+  #offset-display {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin: 10px 0 18px;
+    line-height: 1.1;
+  }
+  #offset-display.on-time  { color: #28a745; }
+  #offset-display.late     { color: #dc3545; }
+  #offset-display.early    { color: #F4B942; }
+
+  .offset-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .adj-btn {
+    border: none;
+    border-radius: 10px;
+    padding: 14px 8px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: 'Barlow', Arial, sans-serif;
+    transition: transform 0.1s, opacity 0.15s;
+  }
+  .adj-btn:active { transform: scale(0.95); opacity: 0.8; }
+  .btn-earlier-big  { background: #FFF3CD; color: #856404; font-size: 13px; }
+  .btn-earlier-sm   { background: #FFF8E6; color: #856404; font-size: 12px; }
+  .btn-later-big    { background: #FDDEDE; color: #721c24; font-size: 13px; }
+  .btn-later-sm     { background: #FEEAEA; color: #721c24; font-size: 12px; }
+  .btn-on-time      { background: #D4EDDA; color: #155724; }
+
+  /* Message */
+  .message-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    border: 1px solid #dce4ed;
+  }
+  #message-field {
+    width: 100%;
+    border: 1px solid #dce4ed;
+    border-radius: 7px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-family: 'Barlow', Arial, sans-serif;
+    color: #1a1a2e;
+    resize: none;
+    height: 70px;
+    margin-top: 6px;
+    outline: none;
+  }
+  #message-field:focus { border-color: #2E75B6; }
+  .message-hint {
+    font-size: 10px;
+    color: #aaa;
+    margin-top: 5px;
+  }
+
+  /* Save button */
+  #save-btn {
+    width: 100%;
+    background: #1F3864;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: 'Barlow', Arial, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    transition: background 0.2s, transform 0.1s;
+  }
+  #save-btn:active { transform: scale(0.98); }
+  #save-btn.saved  { background: #28a745; }
+
+  #reset-btn {
+    width: 100%;
+    background: #fff;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Barlow', Arial, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;
+    transition: background 0.15s;
+  }
+  #reset-btn:active { background: #FDDEDE; }
+
+  .sign-out-link {
+    display: block;
+    text-align: center;
+    font-size: 11px;
+    color: #aaa;
+    cursor: pointer;
+    padding-bottom: 24px;
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── PIN SCREEN ─────────────────────────────────────── -->
+<div id="pin-screen">
+  <div class="pin-box">
+    <div class="pin-lock">🔒</div>
+    <h2>Course Director Portal</h2>
+    <p>West Midlands Critical Care Transfer Course</p>
+    <div id="pin-dots">○ ○ ○ ○</div>
+    <div class="pin-pad">
+      <button class="pin-btn" onclick="pinPress('1')">1</button>
+      <button class="pin-btn" onclick="pinPress('2')">2</button>
+      <button class="pin-btn" onclick="pinPress('3')">3</button>
+      <button class="pin-btn" onclick="pinPress('4')">4</button>
+      <button class="pin-btn" onclick="pinPress('5')">5</button>
+      <button class="pin-btn" onclick="pinPress('6')">6</button>
+      <button class="pin-btn" onclick="pinPress('7')">7</button>
+      <button class="pin-btn" onclick="pinPress('8')">8</button>
+      <button class="pin-btn" onclick="pinPress('9')">9</button>
+      <button class="pin-btn empty"></button>
+      <button class="pin-btn" onclick="pinPress('0')">0</button>
+      <button class="pin-btn backspace" onclick="pinBackspace()">⌫</button>
+    </div>
+    <div id="pin-error"></div>
+  </div>
+</div>
+
+<!-- ── MANAGEMENT SCREEN ──────────────────────────────── -->
+<div id="mgmt-screen">
+
+  <div class="mgmt-header">
+    <div class="title">
+      <h1>Course Director Portal</h1>
+      <div class="subtitle">WMCCTC &nbsp;|&nbsp; 12 June 2026</div>
+    </div>
+    <span class="lock-badge">🔒 Secured</span>
+  </div>
+
+  <div class="mgmt-body">
+
+    <!-- Live status (read from Firebase) -->
+    <div class="current-status-card">
+      <div class="card-label">&#128247; Current broadcast to delegates</div>
+      <div id="live-status-text">Loading…</div>
+      <div id="last-updated"></div>
+    </div>
+
+    <!-- Offset control -->
+    <div class="offset-card">
+      <div class="card-label">&#9201; Adjust programme timing</div>
+      <div id="offset-display" class="on-time">ON TIME</div>
+      <div class="offset-controls">
+        <button class="adj-btn btn-earlier-big" onclick="adjustOffset(-5)">&#9664;&#9664; 5 min<br>earlier</button>
+        <button class="adj-btn btn-on-time"     onclick="setOnTime()">&#10003;<br>On Time</button>
+        <button class="adj-btn btn-later-big"   onclick="adjustOffset(+5)">5 min<br>later &#9654;&#9654;</button>
+        <button class="adj-btn btn-earlier-sm"  onclick="adjustOffset(-1)">&#9664; 1 min<br>earlier</button>
+        <button class="adj-btn empty-slot"      style="background:transparent;pointer-events:none;"></button>
+        <button class="adj-btn btn-later-sm"    onclick="adjustOffset(+1)">1 min<br>later &#9654;</button>
+      </div>
+    </div>
+
+    <!-- Message -->
+    <div class="message-card">
+      <div class="card-label">&#128172; Optional message to delegates</div>
+      <textarea id="message-field" placeholder="e.g. Lunch extended — back at 14:20  |  Leave blank for no message"></textarea>
+      <div class="message-hint">Shown as a banner at the top of the delegate timetable. Leave blank to hide.</div>
+    </div>
+
+    <!-- Save / Reset -->
+    <button id="save-btn" onclick="save()">&#128225; Save &amp; Broadcast to All</button>
+    <button id="reset-btn" onclick="resetToOnTime()">&#10006; Clear All &mdash; Reset to On Time</button>
+
+    <span class="sign-out-link" onclick="signOut()">Sign out</span>
+
+  </div>
+</div>
+
+<!-- ── SCRIPT ──────────────────────────────────────────── -->
+<script>
+
+  // ════════════════════════════════════════════════════════
+  //  CONFIGURATION — replace these values with yours
+  // ════════════════════════════════════════════════════════
+  const firebaseConfig = {
+    apiKey:            "AIzaSyDPqISch9KdSDNnzkse4V5hep9aelhEvEA",
+    authDomain:        "wmcctc---timetable.firebaseapp.com",
+    databaseURL:       "https://wmcctc---timetable-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:         "wmcctc---timetable",
+    storageBucket:     "wmcctc---timetable.firebasestorage.app",
+    messagingSenderId: "411927987532",
+    appId:             "1:411927987532:web:39a64b513263df47d53be9"
+  };
+
+  const DIRECTOR_PIN = '1234'; // ← CHANGE THIS before going live
+  // ════════════════════════════════════════════════════════
+
+  firebase.initializeApp(firebaseConfig);
+  const db  = firebase.database();
+  const ref = db.ref('programme');
+
+  // ── PIN logic ────────────────────────────────────────
+  let pinEntry = '';
+
+  function pinPress(n) {
+    if (pinEntry.length >= 4) return;
+    pinEntry += n;
+    renderDots();
+    if (pinEntry.length === 4) setTimeout(checkPin, 250);
+  }
+
+  function pinBackspace() {
+    pinEntry = pinEntry.slice(0, -1);
+    renderDots();
+  }
+
+  function renderDots() {
+    const d = document.getElementById('pin-dots');
+    let s = '';
+    for (let i = 0; i < 4; i++) {
+      s += (i < pinEntry.length ? '●' : '○');
+      if (i < 3) s += ' ';
+    }
+    d.textContent = s;
+  }
+
+  function checkPin() {
+    if (pinEntry === DIRECTOR_PIN) {
+      document.getElementById('pin-screen').style.display = 'none';
+      document.getElementById('mgmt-screen').style.display = 'block';
+      startListening();
+    } else {
+      document.getElementById('pin-error').textContent = 'Incorrect PIN — try again';
+      pinEntry = '';
+      renderDots();
+      setTimeout(() => document.getElementById('pin-error').textContent = '', 2500);
+    }
+  }
+
+  function signOut() {
+    document.getElementById('mgmt-screen').style.display = 'none';
+    document.getElementById('pin-screen').style.display = 'flex';
+    pinEntry = '';
+    renderDots();
+    ref.off(); // stop listener
+  }
+
+  // ── Firebase listener ────────────────────────────────
+  let pendingOffset = 0;
+
+  function startListening() {
+    ref.on('value', snap => {
+      const data = snap.val() || {};
+      pendingOffset = data.offset || 0;
+      renderOffsetDisplay(pendingOffset);
+      document.getElementById('message-field').value = data.message || '';
+
+      // Live status card
+      const statusEl = document.getElementById('live-status-text');
+      if (pendingOffset === 0 && !data.message) {
+        statusEl.innerHTML = '<span style="color:#28a745;font-weight:700;">✓ On time — no message</span>';
+      } else {
+        let parts = [];
+        if (pendingOffset > 0) parts.push(`<span style="color:#dc3545;font-weight:700;">Running ${pendingOffset} mins late</span>`);
+        if (pendingOffset < 0) parts.push(`<span style="color:#F4B942;font-weight:700;">Running ${Math.abs(pendingOffset)} mins early</span>`);
+        if (data.message) parts.push(`"${data.message}"`);
+        statusEl.innerHTML = parts.join(' &nbsp;|&nbsp; ');
+      }
+
+      if (data.updatedAt) {
+        const t = new Date(data.updatedAt);
+        document.getElementById('last-updated').textContent =
+          'Last broadcast: ' + t.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+      } else {
+        document.getElementById('last-updated').textContent = 'Not yet broadcast today';
+      }
+    });
+  }
+
+  // ── Offset controls ──────────────────────────────────
+  function adjustOffset(delta) {
+    pendingOffset += delta;
+    renderOffsetDisplay(pendingOffset);
+  }
+
+  function setOnTime() {
+    pendingOffset = 0;
+    renderOffsetDisplay(0);
+  }
+
+  function renderOffsetDisplay(offset) {
+    const el = document.getElementById('offset-display');
+    if (offset === 0) {
+      el.textContent = 'ON TIME';
+      el.className = 'on-time';
+    } else if (offset > 0) {
+      el.textContent = '+' + offset + ' MINS\nLATE';
+      el.innerHTML = '+' + offset + ' MINS<br><span style="font-size:18px;font-weight:600;">behind schedule</span>';
+      el.className = 'late';
+    } else {
+      el.innerHTML = Math.abs(offset) + ' MINS<br><span style="font-size:18px;font-weight:600;">ahead of schedule</span>';
+      el.className = 'early';
+    }
+  }
+
+  // ── Save ─────────────────────────────────────────────
+  function save() {
+    const msg = document.getElementById('message-field').value.trim();
+    ref.set({
+      offset:    pendingOffset,
+      message:   msg,
+      updatedAt: Date.now()
+    }).then(() => {
+      const btn = document.getElementById('save-btn');
+      btn.textContent = '✓ Broadcast Sent';
+      btn.classList.add('saved');
+      setTimeout(() => {
+        btn.textContent = '📡 Save & Broadcast to All';
+        btn.classList.remove('saved');
+      }, 2500);
+    });
+  }
+
+  function resetToOnTime() {
+    pendingOffset = 0;
+    document.getElementById('message-field').value = '';
+    renderOffsetDisplay(0);
+    ref.set({ offset: 0, message: '', updatedAt: Date.now() });
+  }
+
+</script>
+
+</body>
+</html>
