@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WMCCTC – Live Timetable – 12 June 2026</title>
+<title>WMCCTC – Live Timetable – 9 October 2026</title>
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -151,7 +151,6 @@
   }
   .session-row:last-child { border-bottom: none; }
 
-  /* Time column */
   .time-col {
     min-width: 88px;
     padding: 9px 10px;
@@ -168,7 +167,6 @@
     flex-shrink: 0;
   }
 
-  /* Content column */
   .content-col {
     flex: 1;
     padding: 9px 12px;
@@ -190,7 +188,6 @@
     line-height: 1.4;
   }
 
-  /* Break rows */
   .session-row.break .time-col {
     background: #f5f5f5;
     color: #888;
@@ -205,19 +202,13 @@
     letter-spacing: 0.5px;
   }
 
-  /* PAST rows */
-  .session-row.past .time-col {
-    opacity: 0.45;
-  }
-  .session-row.past .content-col {
-    opacity: 0.4;
-  }
+  .session-row.past .time-col { opacity: 0.45; }
+  .session-row.past .content-col { opacity: 0.4; }
   .session-row.past .session-title {
     text-decoration: line-through;
     text-decoration-color: #aaa;
   }
 
-  /* CURRENT (live) row */
   .session-row.current {
     background: #e6f9ee;
     border-left: 4px solid #28a745;
@@ -227,14 +218,9 @@
     color: #155724;
     border-right-color: #9dddb6;
   }
-  .session-row.current .session-title {
-    color: #155724;
-  }
-  .session-row.current .session-detail {
-    color: #2d7a4e;
-  }
+  .session-row.current .session-title { color: #155724; }
+  .session-row.current .session-detail { color: #2d7a4e; }
 
-  /* NOW badge */
   .now-badge {
     display: none;
     align-items: center;
@@ -251,8 +237,7 @@
     flex-shrink: 0;
   }
   .now-badge .dot {
-    width: 7px;
-    height: 7px;
+    width: 7px; height: 7px;
     background: #fff;
     border-radius: 50%;
     animation: pulse-white 1.4s ease-in-out infinite;
@@ -264,35 +249,7 @@
   }
   .session-row.current .now-badge { display: flex; }
 
-  /* Badges */
-  .badge-new {
-    display: inline-block;
-    background: #C55A11;
-    color: #fff;
-    font-size: 8px;
-    font-weight: 700;
-    padding: 1px 5px;
-    border-radius: 3px;
-    margin-left: 5px;
-    text-transform: uppercase;
-    vertical-align: middle;
-    letter-spacing: 0.5px;
-  }
-  .badge-upd {
-    display: inline-block;
-    background: #2E75B6;
-    color: #fff;
-    font-size: 8px;
-    font-weight: 700;
-    padding: 1px 5px;
-    border-radius: 3px;
-    margin-left: 5px;
-    text-transform: uppercase;
-    vertical-align: middle;
-    letter-spacing: 0.5px;
-  }
-
-  /* ── Rotation / Sim sub-table ─────────────────── */
+  /* ── Rotation / Sim chips ─────────────────────── */
   .group-grid {
     display: flex;
     gap: 4px;
@@ -376,7 +333,6 @@
     display: block;
   }
 
-  /* ── Responsive ──────────────────────────────── */
   @media (max-width: 480px) {
     .time-col { min-width: 72px; font-size: 10px; }
     .session-title { font-size: 11.5px; }
@@ -423,7 +379,7 @@
 
 <!-- ── CLOCK BAR ────────────────────────────────────────── -->
 <div class="clock-bar">
-  <span class="date-venue">&#128197; 12 June 2026 &nbsp;|&nbsp; &#128205; Education Centre, Level 5 – MMUH</span>
+  <span class="date-venue">&#128197; 9 October 2026 &nbsp;|&nbsp; &#128205; Education Centre, Level 5 – MMUH</span>
   <span class="live-clock" id="clock">--:--</span>
 </div>
 
@@ -440,9 +396,7 @@
   <div class="session-row" data-start="08:00" data-end="08:15">
     <div class="time-col">08:00&ndash;08:15</div>
     <div class="content-col">
-      <div>
-        <div class="session-title">Registration</div>
-      </div>
+      <div><div class="session-title">Registration</div></div>
       <div class="now-badge"><div class="dot"></div>NOW</div>
     </div>
   </div>
@@ -485,7 +439,7 @@
     <div class="content-col">
       <div>
         <div class="session-title">Ventilation for Transfer</div>
-        <div class="session-detail">Transport ventilator settings &nbsp;|&nbsp; Monitoring &nbsp;|&nbsp; Waveform interpretation &nbsp;|&nbsp; Dr Kieran Donnelly</div>
+        <div class="session-detail">Transport ventilator settings &nbsp;|&nbsp; Monitoring &nbsp;|&nbsp; Waveform interpretation &nbsp;|&nbsp; ACCP Gavin Denton</div>
       </div>
       <div class="now-badge"><div class="dot"></div>NOW</div>
     </div>
@@ -502,19 +456,8 @@
     </div>
   </div>
 
-  <div class="session-row" data-start="10:25" data-end="10:50">
-    <div class="time-col">10:25&ndash;10:50</div>
-    <div class="content-col">
-      <div>
-        <div class="session-title">ACCoTS – Adult Critical Care Transfer Service</div>
-        <div class="session-detail">Role of the West Midlands dedicated transfer service &nbsp;|&nbsp; When and how to call &nbsp;|&nbsp; Andrew Boazman (Deputy Lead Practitioner)</div>
-      </div>
-      <div class="now-badge"><div class="dot"></div>NOW</div>
-    </div>
-  </div>
-
-  <div class="session-row break" data-start="10:50" data-end="11:05">
-    <div class="time-col">10:50&ndash;11:05</div>
+  <div class="session-row break" data-start="10:25" data-end="10:40">
+    <div class="time-col">10:25&ndash;10:40</div>
     <div class="content-col">
       &#9749; Coffee Break
       <div class="now-badge" style="background:#888;"><div class="dot"></div>NOW</div>
@@ -527,64 +470,64 @@
 <div class="section-label">Group Workshops &nbsp;&#8212;&nbsp; 35 minutes each</div>
 <div class="session-list">
 
-  <div class="session-row" data-start="11:05" data-end="11:35">
-    <div class="time-col">11:05&ndash;11:35</div>
+  <div class="session-row" data-start="10:40" data-end="11:15">
+    <div class="time-col">10:40&ndash;11:15</div>
     <div class="content-col">
       <div>
         <div class="session-title">Rotation Round 1</div>
         <div class="group-grid">
-          <span class="group-chip g1">Grp 1 – Ventilation &nbsp;(Janine / Kieran)</span>
-          <span class="group-chip g2">Grp 2 – Cardiovascular &nbsp;(Lucy / Divya)</span>
-          <span class="group-chip g3">Grp 3 – Specialist Circs &nbsp;(Sonia / Tom)</span>
-          <span class="group-chip g4">Grp 4 – Sedation &nbsp;(Wasim)</span>
+          <span class="group-chip g1">Grp 1 – Ventilation &nbsp;(Gav / Janine)</span>
+          <span class="group-chip g2">Grp 2 – Cardiovascular &nbsp;(Lucy / Rahul)</span>
+          <span class="group-chip g3">Grp 3 – Specialist Circs &nbsp;(Andy / Tom)</span>
+          <span class="group-chip g4">Grp 4 – Sedation &nbsp;(Jon / Amit)</span>
         </div>
       </div>
       <div class="now-badge"><div class="dot"></div>NOW</div>
     </div>
   </div>
 
-  <div class="session-row" data-start="11:35" data-end="12:10">
-    <div class="time-col">11:35&ndash;12:10</div>
+  <div class="session-row" data-start="11:15" data-end="11:50">
+    <div class="time-col">11:15&ndash;11:50</div>
     <div class="content-col">
       <div>
         <div class="session-title">Rotation Round 2</div>
         <div class="group-grid">
-          <span class="group-chip g2">Grp 2 – Ventilation &nbsp;(Janine / Kieran)</span>
-          <span class="group-chip g1">Grp 1 – Cardiovascular &nbsp;(Lucy / Divya)</span>
-          <span class="group-chip g4">Grp 4 – Specialist Circs &nbsp;(Sonia / Tom)</span>
-          <span class="group-chip g3">Grp 3 – Sedation &nbsp;(Wasim)</span>
+          <span class="group-chip g2">Grp 2 – Ventilation &nbsp;(Gav / Janine)</span>
+          <span class="group-chip g1">Grp 1 – Cardiovascular &nbsp;(Lucy / Rahul)</span>
+          <span class="group-chip g4">Grp 4 – Specialist Circs &nbsp;(Andy / Tom)</span>
+          <span class="group-chip g3">Grp 3 – Sedation &nbsp;(Jon / Amit)</span>
         </div>
       </div>
       <div class="now-badge"><div class="dot"></div>NOW</div>
     </div>
   </div>
 
-  <div class="session-row" data-start="12:10" data-end="12:45">
-    <div class="time-col">12:10&ndash;12:45</div>
+  <div class="session-row" data-start="11:50" data-end="12:25">
+    <div class="time-col">11:50&ndash;12:25</div>
     <div class="content-col">
       <div>
         <div class="session-title">Rotation Round 3</div>
         <div class="group-grid">
-          <span class="group-chip g3">Grp 3 – Ventilation &nbsp;(Janine / Kieran)</span>
-          <span class="group-chip g4">Grp 4 – Cardiovascular &nbsp;(Lucy / Divya)</span>
-          <span class="group-chip g1">Grp 1 – Specialist Circs &nbsp;(Sonia / Tom)</span>
-          <span class="group-chip g2">Grp 2 – Sedation &nbsp;(Wasim)</span>
+          <span class="group-chip g3">Grp 3 – Ventilation &nbsp;(Gav / Janine)</span>
+          <span class="group-chip g4">Grp 4 – Cardiovascular &nbsp;(Lucy / Rahul)</span>
+          <span class="group-chip g1">Grp 1 – Specialist Circs &nbsp;(Andy / Tom)</span>
+          <span class="group-chip g2">Grp 2 – Sedation &nbsp;(Jon / Amit)</span>
         </div>
       </div>
       <div class="now-badge"><div class="dot"></div>NOW</div>
     </div>
   </div>
 
-  <div class="session-row" data-start="12:45" data-end="13:20">
-    <div class="time-col">12:45&ndash;13:20</div>
+  <div class="session-row" data-start="12:25" data-end="13:00">
+    <div class="time-col">12:25&ndash;13:00</div>
     <div class="content-col">
       <div>
         <div class="session-title">Rotation Round 4</div>
         <div class="group-grid">
-          <span class="group-chip g4">Grp 4 – Ventilation &nbsp;(Janine / Kieran)</span>
-          <span class="group-chip g3">Grp 3 – Cardiovascular &nbsp;(Lucy / Divya)</span>
-          <span class="group-chip g2">Grp 2 – Specialist Circs &nbsp;(Sonia / Tom)</span>
-          <span class="group-chip g1">Grp 1 – Sedation &nbsp;(Wasim)</span>
+          <span class="group-chip g4">Grp 4 – Ventilation &nbsp;(Gav / Janine)</span>
+          <span class="group-chip g3">Grp 3 – Cardiovascular &nbsp;(Lucy / Rahul)</span>
+          <span class="group-chip g2">Grp 2 – Specialist Circs &nbsp;(Andy / Tom)</span>
+          <span class="group-chip g1">Grp 1 – Sedation &nbsp;(Jon / Amit)</span>
         </div>
       </div>
       <div class="now-badge"><div class="dot"></div>NOW</div>
@@ -593,15 +536,28 @@
 
 </div><!-- /rotations -->
 
-<!-- ── LUNCH ─────────────────────────────────────────────── -->
+<!-- ── ACCoTS + LUNCH ─────────────────────────────────────── -->
 <div class="session-list">
+
+  <div class="session-row" data-start="13:00" data-end="13:25">
+    <div class="time-col">13:00&ndash;13:25</div>
+    <div class="content-col">
+      <div>
+        <div class="session-title">ACCoTS – Adult Critical Care Transfer Service</div>
+        <div class="session-detail">Role of the West Midlands dedicated transfer service &nbsp;|&nbsp; Amie Whitehouse (Transfer Practitioner)</div>
+      </div>
+      <div class="now-badge"><div class="dot"></div>NOW</div>
+    </div>
+  </div>
+
   <div class="session-row break" data-start="13:30" data-end="14:00">
     <div class="time-col">13:30&ndash;14:00</div>
     <div class="content-col">
-      &#127860; Lunch &nbsp;&#8212;&nbsp; FERNO Transfer Trolley &amp; Transport Ventilator Display
+      &#127860; Lunch &nbsp;&#8212;&nbsp; ATOS Tracheostomy, FERNO Transfer Trolley &amp; Transport Ventilator Display
       <div class="now-badge" style="background:#888;"><div class="dot"></div>NOW</div>
     </div>
   </div>
+
 </div>
 
 <!-- ── AFTERNOON ──────────────────────────────────────────── -->
@@ -628,9 +584,9 @@
       <div>
         <div class="session-title">Simulation Block 1</div>
         <div class="group-grid">
-          <span class="group-chip ga">Sim Suite &ndash; Grp 1 Scenario 1 &nbsp;(Divya / Sonia / Lucy / Kieran)</span>
+          <span class="group-chip ga">Sim Suite &ndash; Grp 1 Scenario 1 &nbsp;(Sonia / Lucy / Gavin / Rahul / Andy)</span>
           <span class="group-chip gb">Grp 2 – Debrief</span>
-          <span class="group-chip gc">Skills Room &ndash; Grp 3 Scenario 3 &nbsp;(Emma / Tom / Janine / Jon / Wasim)</span>
+          <span class="group-chip gc">Skills Room &ndash; Grp 3 Scenario 3 &nbsp;(Emma / Balaji / Janine / Amit)</span>
           <span class="group-chip gd">Grp 4 – Debrief</span>
         </div>
       </div>
@@ -644,9 +600,9 @@
       <div>
         <div class="session-title">Simulation Block 2</div>
         <div class="group-grid">
-          <span class="group-chip gb">Sim Suite &ndash; Grp 2 Scenario 2 &nbsp;(Divya / Sonia / Lucy / Kieran)</span>
+          <span class="group-chip gb">Sim Suite &ndash; Grp 2 Scenario 2 &nbsp;(Sonia / Lucy / Gavin / Rahul / Andy)</span>
           <span class="group-chip ga">Grp 1 – Debrief</span>
-          <span class="group-chip gd">Skills Room &ndash; Grp 4 Scenario 4 &nbsp;(Emma / Tom / Janine / Jon / Wasim)</span>
+          <span class="group-chip gd">Skills Room &ndash; Grp 4 Scenario 4 &nbsp;(Emma / Balaji / Janine / Amit)</span>
           <span class="group-chip gc">Grp 3 – Debrief</span>
         </div>
       </div>
@@ -668,9 +624,9 @@
       <div>
         <div class="session-title">Simulation Block 3</div>
         <div class="group-grid">
-          <span class="group-chip gc">Sim Suite &ndash; Grp 3 Scenario 1 &nbsp;(Divya / Sonia / Lucy / Kieran)</span>
+          <span class="group-chip gc">Sim Suite &ndash; Grp 3 Scenario 1 &nbsp;(Sonia / Lucy / Gavin / Rahul / Andy)</span>
           <span class="group-chip gd">Grp 4 – Debrief</span>
-          <span class="group-chip ga">Skills Room &ndash; Grp 1 Scenario 3 &nbsp;(Emma / Tom / Janine / Jon / Wasim)</span>
+          <span class="group-chip ga">Skills Room &ndash; Grp 1 Scenario 3 &nbsp;(Emma / Balaji / Janine / Amit)</span>
           <span class="group-chip gb">Grp 2 – Debrief</span>
         </div>
       </div>
@@ -684,9 +640,9 @@
       <div>
         <div class="session-title">Simulation Block 4</div>
         <div class="group-grid">
-          <span class="group-chip gd">Sim Suite &ndash; Grp 4 Scenario 2 &nbsp;(Divya / Sonia / Lucy / Kieran)</span>
+          <span class="group-chip gd">Sim Suite &ndash; Grp 4 Scenario 2 &nbsp;(Sonia / Lucy / Gavin / Rahul / Andy)</span>
           <span class="group-chip gc">Grp 3 – Debrief</span>
-          <span class="group-chip gb">Skills Room &ndash; Grp 2 Scenario 4 &nbsp;(Emma / Tom / Janine / Jon / Wasim)</span>
+          <span class="group-chip gb">Skills Room &ndash; Grp 2 Scenario 4 &nbsp;(Emma / Balaji / Janine / Amit)</span>
           <span class="group-chip ga">Grp 1 – Debrief</span>
         </div>
       </div>
@@ -697,9 +653,7 @@
   <div class="session-row" data-start="17:45" data-end="18:00">
     <div class="time-col">17:45&ndash;18:00</div>
     <div class="content-col">
-      <div>
-        <div class="session-title">Candidate Evaluation &amp; Close</div>
-      </div>
+      <div><div class="session-title">Course Close &amp; Candidate Evaluations</div></div>
       <div class="now-badge"><div class="dot"></div>NOW</div>
     </div>
   </div>
@@ -715,16 +669,12 @@
 
 <!-- ── FOOTER ──────────────────────────────────────────── -->
 <div class="footer">
-  <span>West Midlands Critical Care Transfer Course &nbsp;|&nbsp; 12 June 2026</span>
+  <span>West Midlands Critical Care Transfer Course &nbsp;|&nbsp; 9 October 2026</span>
   <span class="r-badge">R Revalidation for Anaesthetists</span>
 </div>
 
 <!-- ── LIVE SCRIPT ─────────────────────────────────────── -->
 <script>
-
-  // ════════════════════════════════════════════════════════
-  //  FIREBASE CONFIG — replace with your project values
-  // ════════════════════════════════════════════════════════
   const firebaseConfig = {
     apiKey:            "AIzaSyDPqISch9KdSDNnzkse4V5hep9aelhEvEA",
     authDomain:        "wmcctc---timetable.firebaseapp.com",
@@ -734,36 +684,30 @@
     messagingSenderId: "411927987532",
     appId:             "1:411927987532:web:39a64b513263df47d53be9"
   };
-  // ════════════════════════════════════════════════════════
 
   firebase.initializeApp(firebaseConfig);
   const db  = firebase.database();
   const ref = db.ref('programme');
 
-  const COURSE_DATE = '2026-06-12';
-  let activeOffset  = 0; // minutes; positive = running late
+  const COURSE_DATE = '2026-10-09';
+  let activeOffset  = 0;
 
-  // ── Store original times on load ─────────────────────
   document.querySelectorAll('.session-row[data-start]').forEach(row => {
     row.dataset.origStart = row.dataset.start;
     row.dataset.origEnd   = row.dataset.end;
   });
 
-  // ── Helpers ──────────────────────────────────────────
   function toMinutes(hhmm) {
     const [h, m] = hhmm.split(':').map(Number);
     return h * 60 + m;
   }
-
   function pad(n) { return String(n).padStart(2, '0'); }
-
   function addMins(hhmm, delta) {
     const total = toMinutes(hhmm) + delta;
     const safe  = ((total % 1440) + 1440) % 1440;
     return pad(Math.floor(safe / 60)) + ':' + pad(safe % 60);
   }
 
-  // ── Apply offset to all row display times ────────────
   function applyOffset(offset) {
     activeOffset = offset;
     document.querySelectorAll('.session-row[data-start]').forEach(row => {
@@ -777,7 +721,6 @@
     update();
   }
 
-  // ── Update offset + message banner ───────────────────
   function updateOffsetBanner(offset, message) {
     const el = document.getElementById('offset-banner');
     if (offset === 0 && !message) {
@@ -801,7 +744,6 @@
     el.innerHTML = html;
   }
 
-  // ── Firebase listener ─────────────────────────────────
   ref.on('value', snap => {
     const data   = snap.val() || {};
     const offset = data.offset  || 0;
@@ -810,10 +752,8 @@
     updateOffsetBanner(offset, msg);
   });
 
-  // ── Main timetable update (runs every 15s) ────────────
   function update() {
     const now = new Date();
-
     document.getElementById('clock').textContent =
       pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
 
@@ -827,18 +767,17 @@
     if (today < COURSE_DATE) {
       const daysLeft = Math.ceil((new Date(COURSE_DATE) - new Date(today)) / 86400000);
       banner.className = 'wrong-day';
-      banner.innerHTML = `&#128197; Course day is <strong>12 June 2026</strong> &mdash; ${daysLeft} day${daysLeft !== 1 ? 's' : ''} to go. Live tracking activates on the day.`;
+      banner.innerHTML = `&#128197; Course day is <strong>9 October 2026</strong> &mdash; ${daysLeft} day${daysLeft !== 1 ? 's' : ''} to go. Live tracking activates on the day.`;
       return;
     }
 
     if (today > COURSE_DATE) {
       banner.className = 'ended';
-      banner.innerHTML = `&#10003; Course completed &mdash; 12 June 2026. Thank you to all faculty and delegates.`;
+      banner.innerHTML = `&#10003; Course completed &mdash; 9 October 2026. Thank you to all faculty and delegates.`;
       rows.forEach(r => r.classList.add('past'));
       return;
     }
 
-    // Course day
     const courseStart = toMinutes('08:00');
     const courseEnd   = toMinutes('18:00');
 
@@ -870,7 +809,7 @@
 
     if (currentRow) {
       const title     = currentRow.querySelector('.session-title');
-      const titleText = title ? title.textContent.replace(/\s*(New|Updated)\s*/gi, '').trim() : 'current session';
+      const titleText = title ? title.textContent.trim() : 'current session';
       const remaining = toMinutes(currentRow.dataset.end) - nowMins;
       banner.className = 'live';
       banner.innerHTML = `<span class="pulse-dot"></span><strong>NOW:</strong> ${titleText} &nbsp;&mdash;&nbsp; ${remaining} minute${remaining !== 1 ? 's' : ''} remaining`;
