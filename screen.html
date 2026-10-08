@@ -60,7 +60,7 @@
     flex-direction: column;
     justify-content: center;
     padding: 36px 60px;
-    gap: 0;
+    gap: 16px;
   }
 
   /* ── Director message ────────────────────────── */
@@ -102,9 +102,6 @@
     100% { box-shadow: 0 0 0 0 rgba(244,185,66,0); }
   }
 
-  /* ── Main gap ───────────────────────────────── */
-  .main { gap: 16px; }
-
   /* ── NOW card ────────────────────────────────── */
   .now-card {
     background: rgba(244, 185, 66, 0.12);
@@ -129,6 +126,45 @@
     color: rgba(255,255,255,0.7);
     margin-bottom: 0;
   }
+
+  /* ── Countdown (inside NOW card) ────────────── */
+  .countdown-block {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .countdown-track {
+    flex: 1;
+    height: 10px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .countdown-fill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 1s linear, background 1s;
+  }
+  #countdown-time {
+    font-size: clamp(28px, 3.5vw, 52px);
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    transition: color 1s;
+  }
+  /* Colour states */
+  .cd-green  { color: #4ADE80; }   /* >10 min */
+  .cd-yellow { color: #FACC15; }   /* 5-10 min */
+  .cd-red    { color: #F87171; }   /* <5 min */
+  .cd-end    { color: #F87171; animation: flash 0.6s ease-in-out infinite alternate; }
+  @keyframes flash { from { opacity: 1; } to { opacity: 0.3; } }
+  .fill-green  { background: #4ADE80; }
+  .fill-yellow { background: #FACC15; }
+  .fill-red    { background: #F87171; }
 
   /* ── NEXT card ───────────────────────────────── */
   .next-card {
@@ -178,45 +214,6 @@
     font-weight: 600;
   }
 
-  /* ── Countdown (inside NOW card) ────────────── */
-  .countdown-block {
-    margin-top: 18px;
-    padding-top: 16px;
-    border-top: 1px solid rgba(255,255,255,0.12);
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-  .countdown-track {
-    flex: 1;
-    height: 10px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 5px;
-    overflow: hidden;
-  }
-  .countdown-fill {
-    height: 100%;
-    border-radius: 5px;
-    transition: width 1s linear, background 1s;
-  }
-  #countdown-time {
-    font-size: clamp(28px, 3.5vw, 52px);
-    font-weight: 900;
-    font-variant-numeric: tabular-nums;
-    letter-spacing: 1px;
-    white-space: nowrap;
-    transition: color 1s;
-  }
-  /* Colour states */
-  .cd-green  { color: #4ADE80; }   /* >10 min */
-  .cd-yellow { color: #FACC15; }   /* 5-10 min */
-  .cd-red    { color: #F87171; }   /* <5 min */
-  .cd-end    { color: #F87171; animation: flash 0.6s ease-in-out infinite alternate; }
-  @keyframes flash { from { opacity: 1; } to { opacity: 0.3; } }
-  .fill-green  { background: #4ADE80; }
-  .fill-yellow { background: #FACC15; }
-  .fill-red    { background: #F87171; }
-
   /* ── Bottom bar ──────────────────────────────── */
   .bottom-bar {
     background: rgba(0,0,0,0.2);
@@ -241,13 +238,13 @@
 
   <!-- Top bar -->
   <div class="top-bar">
-    <div class="course-name">West Midlands Critical Care Transfer Course &nbsp;|&nbsp; 12 June 2026</div>
+    <div class="course-name">West Midlands Critical Care Transfer Course &nbsp;|&nbsp; 9 October 2026</div>
     <div class="clock" id="clock">--:--</div>
   </div>
 
   <!-- Main content -->
   <div class="main" id="main-content">
-    <div class="state-msg">Loading…</div>
+    <div class="state-msg">Loading&hellip;</div>
   </div>
 
   <!-- Bottom bar -->
@@ -259,7 +256,6 @@
 </div>
 
 <script>
-  // ── Firebase config ───────────────────────────
   const firebaseConfig = {
     apiKey:            "AIzaSyDPqISch9KdSDNnzkse4V5hep9aelhEvEA",
     authDomain:        "wmcctc---timetable.firebaseapp.com",
@@ -274,7 +270,7 @@
   const db  = firebase.database();
   const ref = db.ref('programme');
 
-  const COURSE_DATE = '2026-06-12';
+  const COURSE_DATE = '2026-10-09';
   let activeOffset  = 0;
   let directorMsg   = '';
 
@@ -286,12 +282,12 @@
     { start: '08:45', end: '09:15', title: 'Initial Considerations for Transfer' },
     { start: '09:15', end: '09:55', title: 'Ventilation for Transfer' },
     { start: '09:55', end: '10:25', title: 'Safe Transfer of the Brain Injured Patient' },
-    { start: '10:25', end: '10:50', title: 'ACCoTS – Adult Critical Care Transfer Service' },
-    { start: '10:50', end: '11:05', title: 'Coffee Break' },
-    { start: '11:05', end: '11:35', title: 'Small Group Rotations – Round 1' },
-    { start: '11:35', end: '12:10', title: 'Small Group Rotations – Round 2' },
-    { start: '12:10', end: '12:45', title: 'Small Group Rotations – Round 3' },
-    { start: '12:45', end: '13:20', title: 'Small Group Rotations – Round 4' },
+    { start: '10:25', end: '10:40', title: 'Coffee Break' },
+    { start: '10:40', end: '11:15', title: 'Small Group Rotations – Round 1' },
+    { start: '11:15', end: '11:50', title: 'Small Group Rotations – Round 2' },
+    { start: '11:50', end: '12:25', title: 'Small Group Rotations – Round 3' },
+    { start: '12:25', end: '13:00', title: 'Small Group Rotations – Round 4' },
+    { start: '13:00', end: '13:25', title: 'ACCoTS – Adult Critical Care Transfer Service' },
     { start: '13:30', end: '14:00', title: 'Lunch' },
     { start: '14:00', end: '14:30', title: 'Equipment for Transfer' },
     { start: '14:30', end: '15:15', title: 'Simulation Block 1' },
@@ -299,7 +295,7 @@
     { start: '16:00', end: '16:15', title: 'Coffee Break' },
     { start: '16:15', end: '17:00', title: 'Simulation Block 3' },
     { start: '17:00', end: '17:45', title: 'Simulation Block 4' },
-    { start: '17:45', end: '18:00', title: 'Candidate Evaluation & Close' },
+    { start: '17:45', end: '18:00', title: 'Course Close & Evaluations' },
   ];
 
   // ── Helpers ───────────────────────────────────
@@ -311,10 +307,6 @@
   function addMins(hhmm, delta) {
     const t = ((toMins(hhmm) + delta) % 1440 + 1440) % 1440;
     return pad(Math.floor(t / 60)) + ':' + pad(t % 60);
-  }
-  function fmtTime(hhmm) {
-    // format as e.g. 09:15
-    return hhmm;
   }
 
   // ── Firebase listener ─────────────────────────
@@ -341,7 +333,7 @@
       const isPre = today < COURSE_DATE;
       main.innerHTML = `
         <div class="state-msg">${isPre ? 'Course Day' : 'Course Complete'}</div>
-        <div class="state-sub">${isPre ? '12 June 2026' : 'Thank you to all faculty and delegates'}</div>`;
+        <div class="state-sub">${isPre ? '9 October 2026' : 'Thank you to all faculty and delegates'}</div>`;
       return;
     }
 
@@ -353,26 +345,8 @@
       if (nowMins >= s && nowMins < e) { currentIdx = i; break; }
     }
 
-    // Before course starts
-    if (nowMins < toMins(sessions[0].start) + activeOffset) {
-      const minsLeft = toMins(sessions[0].start) + activeOffset - nowMins;
-      main.innerHTML = `
-        <div class="state-msg">Course starts at ${addMins(sessions[0].start, activeOffset)}</div>
-        <div class="state-sub">${minsLeft} minute${minsLeft !== 1 ? 's' : ''} to go</div>`;
-      return;
-    }
-
-    // After course ends
-    if (nowMins >= toMins(sessions[sessions.length-1].end) + activeOffset) {
-      main.innerHTML = `
-        <div class="state-msg">Course Complete</div>
-        <div class="state-sub">Thank you to all faculty and delegates</div>`;
-      return;
-    }
-
-    // Between sessions (gap e.g. 13:20–13:30)
     if (currentIdx === -1) {
-      // Find next
+      // Before course or between sessions
       let nextIdx = -1;
       for (let i = 0; i < sessions.length; i++) {
         if (toMins(sessions[i].start) + activeOffset > nowMins) { nextIdx = i; break; }
@@ -460,16 +434,17 @@
           <div id="next-session">${nextTitle}</div>
           <div id="next-time">Starts ${nextStart} &nbsp;&mdash;&nbsp; ends ${nextEnd}</div>
         </div>`;
-    } else if (curTitle) {
-      html += `<div class="next-card"><div class="next-label" style="color:rgba(255,255,255,0.3);">Final session of the day</div></div>`;
+    }
+
+    if (!curTitle && !nextTitle) {
+      html += `<div class="state-msg">Course Complete</div>
+               <div class="state-sub">Thank you to all faculty and delegates</div>`;
     }
 
     return html;
   }
 
-  render();
-  setInterval(render, 1000); // 1s tick for smooth countdown
+  setInterval(render, 1000);
 </script>
-
 </body>
 </html>
